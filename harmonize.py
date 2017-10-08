@@ -97,16 +97,16 @@ def main():
     # create a pyaudio instance. I'm pretty sure that we need one of these per function,
     # but we could also probably have a single, global instance of the pyaudio object.
     # Might be worth trying.
-    p = pyaudio.PyAudio()
-    
+    audioOut = pyaudio.PyAudio()
+    audioIn = pyaudio.PyAudio()
     
     queue = Queue()
     queue.put(600) # 600 is the frequency that we get to open with
 
-    output = Thread(target=fifth, args=(queue,))
+    output = Thread(target=fifth, args=(queue,audioOut))
     output.start()
 
-    t_1 = Thread(target=input_thread, args=(queue,))
+    t_1 = Thread(target=input_thread, args=(queue,audioIn))
     time.sleep(1)
     t_1.start()
 
