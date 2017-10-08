@@ -5,7 +5,6 @@ from multiprocessing import Queue
 from threading import Thread
 import time
 
-
 CHUNK = 22050
 FORMAT = pyaudio.paInt16
 swidth = 4
@@ -16,17 +15,11 @@ FIFTH_CONSTANT = 1.498222449086023 # This is the constant we multiply the freque
 THIRD_CONSTANT = 1.259880384713655 # ^^^^^ same thing for the third
 
 
-
-def fifth(frequency_queue):
+def fifth(frequency_queue, p):
     '''
     processes the frequency queue as it comes in (a fifth of the input frequency)
     '''
 
-    # basically while the frequency queue isn't empty, which it should never be....
-    # create a pyaudio instance. I'm pretty sure that we need one of these per function,
-    # but we could also probably have a single, global instance of the pyaudio object.
-    # Might be worth trying.
-    p = pyaudio.PyAudio()
     
     outputstream = p.open( # this struct makes the place where we send audio.
         format=p.get_format_from_width(1),
@@ -99,15 +92,27 @@ def input_thread(output_queue):
                 print("Sent")
                 output_queue.put(thefreq)
 
+def main():
+    # do the main stuff here
+
+    # basically while the frequency queue isn't empty, which it should never be....
+    # create a pyaudio instance. I'm pretty sure that we need one of these per function,
+    # but we could also probably have a single, global instance of the pyaudio object.
+    # Might be worth trying.
+    p = pyaudio.PyAudio()
     
+    
+    queue = Queue()
+    queue.put(600) # 600 is the frequency that we get to open with
 
-queue = Queue()
-queue.put(600) # 600 is the frequency that we get to open with
+    output = Thread(target=fifth, args=(queue,))
+    output.start()
 
-output = Thread(target=fifth, args=(queue,))
-output.start()
+    t_1 = Thread(target=input_thread, args=(queue,))
+    time.sleep(1)
+    t_1.start()
 
-t_1 = Thread(target=input_thread, args=(queue,))
-time.sleep(1)
-t_1.start()
+
+if __name__ = "__main__"
+    main()
 
