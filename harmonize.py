@@ -12,6 +12,9 @@ swidth = 4
 CHANNELS = 2
 RATE = 44100
 
+FIFTH_CONSTANT = 1.498222449086023 # This is the constant we multiply the frequency by to calulate the Fifth
+THIRD_CONSTANT = 1.259880384713655 # ^^^^^ same thing for the third
+
 
 
 def fifth(frequency_queue):
@@ -32,24 +35,27 @@ def fifth(frequency_queue):
         output=True)
     
     print("Ran!") # this is just a XC plug
+
+    freq = frequency_queue.get() # get the most recent function in the queue. Should only run 
+    # the first time the function is run. 
+    
+    i = 0
     while(1):
-        
-        freq = frequency_queue.get() # get the most recent function in the queue. Should only run 
-                                # the first time the function is run.
-        i = 0
-        while(1):
-            fifth = freq * pow(1.05945454545454545455, 7) * pow(2, 0)
-            third = freq * pow(1.05945454545454545455, 4) * pow(2, 0)
-            WAVEDATA = chr(int(math.sin(i / ((44100 / fifth) / math.pi)) * 127 + 128))
-            outputstream.write(WAVEDATA)
-            if(frequency_queue.empty() == False and int(math.sin(i / ((44100 / fifth) / math.pi)) * 127) == 0):
-                while(frequency_queue.empty() == False):
-                    freq = frequency_queue.get()
+        fifth = freq * FIFTH_CONSTANT
+        third = freq * THIRD_CONSTANT
+        WAVEDATA = chr(int(math.sin(  i / ((RATE / fifth) / math.pi)) * 127 + 128))
+        outputstream.write(WAVEDATA)
+
+        if(frequency_queue.empty() == False and int(math.sin(i / ((44100 / fifth) / math.pi)) * 127) == 0):
+            while(frequency_queue.empty() == False):
+                freq = frequency_queue.get()
                 i = 0
-            WAVEDATA = chr(int(math.sin(i / ((44100 / third) / math.pi)) * 127 + 128))
-            outputstream.write(WAVEDATA)
-            
-            i += 1
+
+        WAVEDATA = chr(int(math.sin(  i / ((RATE / third) / math.pi)) * 127 + 128))
+    
+        outputstream.write(WAVEDATA)
+
+        i += 1
 
 
 def input_thread(output_queue):
