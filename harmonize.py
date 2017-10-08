@@ -20,7 +20,6 @@ def fifth(frequency_queue, p):
     processes the frequency queue as it comes in (a fifth of the input frequency)
     '''
 
-    
     outputstream = p.open( # this struct makes the place where we send audio.
         format=p.get_format_from_width(1),
         channels=1,
@@ -51,9 +50,8 @@ def fifth(frequency_queue, p):
         i += 1
 
 
-def input_thread(output_queue):
+def input_thread(output_queue, paudio):
     how_fast = 5
-    paudio = pyaudio.PyAudio()
     stream = paudio.open(format=FORMAT,
                 channels=CHANNELS,
                 rate=RATE,
